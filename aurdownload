@@ -21,7 +21,8 @@ for name in "$@"; do
 
 
   echo "Downloading package '$name'..."
-  wget -nv "http://aur.archlinux.org/packages/$name/$name.tar.gz"
+  nameprefix=`echo $name|cut -c1-2`
+  wget -nv "http://aur.archlinux.org/packages/$nameprefix/$name/$name.tar.gz"
   if [ $? -ne 0 ]; then
     echo "Can't download '$name.tar.gz'. Skipping this package..."
     echo
