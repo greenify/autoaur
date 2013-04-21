@@ -17,9 +17,6 @@ for name in "$@"; do
 	    EXTRACT=1
 	    shift
     else
-	echo "Removing old archive '$name.tar.gz'..."
-	rm -f "$name.tar.gz"
-	
 	echo "Downloading package '$name'..."
 	nameprefix=`echo $name|cut -c1-2`
 	wget -nv "http://aur.archlinux.org/packages/$nameprefix/$name/$name.tar.gz"
@@ -33,4 +30,3 @@ for name in "$@"; do
 	fi
     fi
 done
-
