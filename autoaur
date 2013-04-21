@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # autoaur - automatically mass download, update, build and install AUR packages
-# Version: 1.8
+# Version: 1.9
 # Author Stefan Husmann <stefan-husmann@t-online.de>
 # based on work of Michal Krenek (Mikos) <mikos@sg1.cz>
 #
@@ -21,6 +21,8 @@
 #            when adding or removing packages from the repo 
 #       1.7: removed unneeded and not-working options
 #       1.8: added support for customizepkg
+#       1.9: added support for srcpak
+#       2.0: added support for split packages
 # Basic options:
 CONFIGFILE=~/.autoaur
 ORIGDIR=$(pwd)
@@ -32,6 +34,7 @@ OPT_REMOVEBUILDDIR=1
 OPT_REMOVE=0
 OPT_CLEAN=0
 . /etc/makepkg.conf
+. /etc/abs.conf
 
 # Basic functions:
 msg() {
@@ -180,26 +183,32 @@ fi
 for ITEM in "${GET_FROM_AUR[@]}"; do
   PACKAGE=$(echo $ITEM | cut -d "=" -f 1)
   PACKAGE_ACTION=$(echo $ITEM | cut -d "=" -f 2)
-
+  PKGBASE=$(bsdtar -tf $PACKAGE.tar.gz|head -1|cut -d "/" -f 1)
   case $PACKAGE_ACTION in
-      a) echo enter version number for $PACKAGE
+      a) echo enter version number for $PKGBASE
 	  read NEW_PKGVER
-	 if [ $OPT_DOWNLOAD -eq 1 ]; then
-             aurdownload $PACKAGE
-	     aurupdate $PACKAGE=$NEW_PKGVER
-	 fi;; 
+	  if [ $OPT_DOWNLOAD -eq 1 ]; then
+              aurdownload $PKGBASE
+	      bsdtar -xf $PACKAGE.tar.gz
+	      aurupdate $PKGBASE=$NEW_PKGVER
+	  fi;; 
       c) if [ $OPT_DOWNLOAD -eq 1 ]; then
 	  aurdownload $PACKAGE
-	  pushd $PACKAGE
+	  bsdtar -xf $PACKAGE.tar.gz
+	  pushd $PKGBASE
 	  customizepkg -m > /dev/null
 	  popd
 	 fi;;
+      s) if [ $OPT_DOWNLOAD -eq 1 ]; then
+	  sudo srcpac -Sb $PACKAGE > /dev/null
+	 fi;;
       *) if [ $OPT_DOWNLOAD -eq 1 ]; then
         aurdownload $PACKAGE
+	bsdtar -xf $PACKAGE.tar.gz
   	fi ;;
   esac
 
-  cd $ORIGDIR/$PACKAGE
+  cd $ORIGDIR/$PKGBASE
   msg "Building package $PACKAGE..."
   makepkg -f -s --noconfirm || exit 1
   cd $ORIGDIR
@@ -217,7 +226,7 @@ for ITEM in "${GET_FROM_AUR[@]}"; do
   # Install package:
   if [ $OPT_INSTALL -eq 1 ]; then
     msg "Installing package $PACKAGE.."
-    source $PACKAGE/PKGBUILD
+    source $PKGBASE/PKGBUILD
     repo-remove $PKGDEST/$PERSREPO.db.tar.gz $PACKAGE    
     [ -f $PKGDEST/$pkgname-$pkgver-$pkgrel-${CARCH}${PKGEXT} ] \
 	&& repo-add $PKGDEST/$PERSREPO.db.tar.gz \
