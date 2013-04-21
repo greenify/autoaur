@@ -191,21 +191,25 @@ for ITEM in "${GET_FROM_AUR[@]}"; do
               aurdownload $PKGBASE
 	      bsdtar -xf $PACKAGE.tar.gz
 	      aurupdate $PKGBASE=$NEW_PKGVER
-	  fi;; 
+	  fi
+	  ;; 
       c) if [ $OPT_DOWNLOAD -eq 1 ]; then
 	  aurdownload $PACKAGE
 	  bsdtar -xf $PACKAGE.tar.gz
 	  pushd $PKGBASE
 	  customizepkg -m > /dev/null
 	  popd
-	 fi;;
+	 fi
+	 ;;
       s) if [ $OPT_DOWNLOAD -eq 1 ]; then
 	  sudo srcpac -Sb $PACKAGE > /dev/null
-	 fi;;
+	  fi
+	  ;;
       *) if [ $OPT_DOWNLOAD -eq 1 ]; then
-        aurdownload $PACKAGE
-	bsdtar -xf $PACKAGE.tar.gz
-  	fi ;;
+          aurdownload $PACKAGE
+	  bsdtar -xf $PACKAGE.tar.gz
+  	  fi
+	  ;;
   esac
 
   cd $ORIGDIR/$PKGBASE
