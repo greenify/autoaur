@@ -183,18 +183,17 @@ fi
 for ITEM in "${GET_FROM_AUR[@]}"; do
   PACKAGE=$(echo $ITEM | cut -d "=" -f 1)
   PACKAGE_ACTION=$(echo $ITEM | cut -d "=" -f 2)
+  aurdownload $PACKAGE
   PKGBASE=$(bsdtar -tf $PACKAGE.tar.gz|head -1|cut -d "/" -f 1)
   case $PACKAGE_ACTION in
       a) echo enter version number for $PKGBASE
 	  read NEW_PKGVER
 	  if [ $OPT_DOWNLOAD -eq 1 ]; then
-              aurdownload $PKGBASE
 	      bsdtar -xf $PACKAGE.tar.gz
 	      aurupdate $PKGBASE=$NEW_PKGVER
 	  fi
 	  ;; 
       c) if [ $OPT_DOWNLOAD -eq 1 ]; then
-	  aurdownload $PACKAGE
 	  bsdtar -xf $PACKAGE.tar.gz
 	  pushd $PKGBASE
 	  customizepkg -m > /dev/null
@@ -206,7 +205,6 @@ for ITEM in "${GET_FROM_AUR[@]}"; do
 	  fi
 	  ;;
       *) if [ $OPT_DOWNLOAD -eq 1 ]; then
-          aurdownload $PACKAGE
 	  bsdtar -xf $PACKAGE.tar.gz
   	  fi
 	  ;;
