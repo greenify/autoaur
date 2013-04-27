@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # autoaur - automatically mass download, update, build and install AUR packages
-# Version: 1.9
+# Version: 1.9.1
 # Author Stefan Husmann <stefan-husmann@t-online.de>
 # based on work of Michal Krenek (Mikos) <mikos@sg1.cz>
 #
@@ -22,6 +22,7 @@
 #       1.7: removed unneeded and not-working options
 #       1.8: added support for customizepkg
 #       1.9: added support for srcpak
+#       1.9.1: several bugfixes 
 #       2.0: added support for split packages
 # Basic options:
 CONFIGFILE=~/.autoaur
@@ -185,6 +186,7 @@ for ITEM in "${GET_FROM_AUR[@]}"; do
   PACKAGE_ACTION=$(echo $ITEM | cut -d "=" -f 2)
   aurdownload $PACKAGE
   PKGBASE=$(bsdtar -tf $PACKAGE.tar.gz|head -1|cut -d "/" -f 1)
+echo $PKGBASE
   case $PACKAGE_ACTION in
       a) echo enter version number for $PKGBASE
 	  read NEW_PKGVER
@@ -192,12 +194,14 @@ for ITEM in "${GET_FROM_AUR[@]}"; do
 	      bsdtar -xf $PACKAGE.tar.gz
 	      aurupdate $PKGBASE=$NEW_PKGVER
 	  fi
+	  rm $PACKAGE.tar.gz
 	  ;; 
       c) if [ $OPT_DOWNLOAD -eq 1 ]; then
 	  bsdtar -xf $PACKAGE.tar.gz
 	  pushd $PKGBASE
 	  customizepkg -m > /dev/null
 	  popd
+	  rm $PACKAGE.tar.gz
 	 fi
 	 ;;
       s) if [ $OPT_DOWNLOAD -eq 1 ]; then
@@ -206,6 +210,7 @@ for ITEM in "${GET_FROM_AUR[@]}"; do
 	  ;;
       *) if [ $OPT_DOWNLOAD -eq 1 ]; then
 	  bsdtar -xf $PACKAGE.tar.gz
+	  rm $PACKAGE.tar.gz
   	  fi
 	  ;;
   esac
