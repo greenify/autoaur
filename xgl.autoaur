@@ -6,6 +6,8 @@
 #  v ... automatic update (with versionpkg)
 #  m ... manual update
 #  n ... no update
+#  c ... with customizepkg
+#  s ... with srcpac
 # Put in the name of your personal repo, if you want to use autoaur-repo,
 # as defined in pacman.conf, without path and suffix
 PERSREPO=my

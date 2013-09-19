@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # autoaur - automatically mass download, update, build and install AUR packages
-# Version: 1.9.1
+# Version: 1.9.2
 # Author Stefan Husmann <stefan-husmann@t-online.de>
 # based on work of Michal Krenek (Mikos) <mikos@sg1.cz>
 #
@@ -23,7 +23,8 @@
 #       1.8: added support for customizepkg
 #       1.9: added support for srcpak
 #       1.9.1: several bugfixes 
-#       2.0: added support for split packages
+#	1.9.2: sample file updated
+#       2.0: added support for split packages (Todo)
 # Basic options:
 CONFIGFILE=~/.autoaur
 ORIGDIR=$(pwd)
