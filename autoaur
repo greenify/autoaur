@@ -218,7 +218,17 @@ echo $PKGBASE
 
   cd $ORIGDIR/$PKGBASE
   msg "Building package $PACKAGE..."
-  makepkg -f -s --noconfirm || exit 1
+
+  pkgversString=""
+  while read -r line
+	do
+	    echo "$line"
+	    if echo "$line" | grep -i -q "Updated version:" ; then
+	    	echo "pkgversion string found."
+	    	pkgversString=$line
+	    fi
+	done < <(makepkg -f -s --noconfirm 2>&1)
+
   cd $ORIGDIR
 
   # Remove conflicting packages:
@@ -231,10 +241,19 @@ echo $PKGBASE
     done
   fi
 
+  # get the correct version (if package uses versioning from git)
+  pkgArray=(${pkgversString//:/ })
+  pkgverGit=${pkgArray[4]}
+
   # Install package:
   if [ $OPT_INSTALL -eq 1 ]; then
     msg "Installing package $PACKAGE.."
     source $PKGBASE/PKGBUILD
+    
+    # change the package version
+    pkgver=$pkgverGit
+    # otherwise add "-$pkgrel"
+
     repo-remove $PKGDEST/$PERSREPO.db.tar.gz $PACKAGE    
     [ -f $PKGDEST/$pkgname-$pkgver-$pkgrel-${CARCH}${PKGEXT} ] \
 	&& repo-add $PKGDEST/$PERSREPO.db.tar.gz \
@@ -242,7 +261,7 @@ echo $PKGBASE
     [ -f $PKGDEST/$pkgname-$pkgver-$pkgrel-any${PKGEXT} ] \
 	&& repo-add $PKGDEST/$PERSREPO.db.tar.gz \
 	$PKGDEST/$pkgname-$pkgver-$pkgrel-any${PKGEXT}
-    sudo pacman -Suy --noconfirm $PACKAGE
-    sudo pacman -Suy --noconfirm $PACKAGE
+    sudo pacman -U --noconfirm $PKGBASE/$pkgname-$pkgver-${CARCH}${PKGEXT}
+    #sudo pacman -Suy --noconfirm $PACKAGE
   fi
 done
